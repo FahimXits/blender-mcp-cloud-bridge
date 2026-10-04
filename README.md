@@ -5,87 +5,123 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Blender](https://img.shields.io/badge/Blender-4.2%20%7C%205.x-E87D0D?style=flat-square&logo=blender&logoColor=white)](https://www.blender.org/)
 [![Protocol](https://img.shields.io/badge/Protocol-MCP%20%2B%20REST-7928ca?style=flat-square)](https://modelcontextprotocol.io/)
-[![Tunnel](https://img.shields.io/badge/Tunnel-Cloudflare%20%7C%20ngrok-F38020?style=flat-square)](https://www.cloudflare.com/)
+[![Cloud Agents](https://img.shields.io/badge/Built%20For-Muse%20AI%20%7C%20OpenClaw%20%7C%20Hermes-00f2fe?style=flat-square)](https://github.com/FahimXits/blender-mcp-cloud-bridge)
 [![License](https://img.shields.io/badge/License-GPL--3.0-green?style=flat-square)](LICENSE)
 
-**A secure, zero-dependency bridge connecting cloud AI agents (Claude, Cursor, Muse AI, Hermes, ChatGPT) to local Blender 3D via the Model Context Protocol (MCP) and automated tunnels.**
+**Engineered for Cloud AI Assistants (Muse AI, OpenClaw, Hermes) & autonomous agents to remotely drive local Blender 3D via Model Context Protocol (MCP) and secure automated tunnels.**
 
 </div>
 
 ---
 
-## 💡 The Problem & The Solution
+## 🎯 Purpose-Built for Cloud AI Assistants
 
-* **The Problem:** The official Blender MCP add-on runs exclusively on `localhost:9876`. Cloud-hosted AI agents (Claude, Cursor, custom cloud LLM pipelines, autonomous agents) cannot connect to local machines behind domestic routers and corporate firewalls.
-* **The Solution:** **Blender MCP Cloud Bridge** provides an automated, authenticated HTTPS bridge with **zero external Python dependencies**. It provisions an instant public tunnel (Cloudflare or ngrok) and exposes standard **MCP (SSE + Streamable HTTP)** and **REST** endpoints guarded by Bearer API authentication.
+Most Blender MCP servers are locked to `localhost:9876`. While this works for local desktop apps, **modern autonomous AI agents (Muse AI, OpenClaw, Hermes, cloud LangChain/AutoGPT pipelines) run in remote cloud containers**. They are completely blocked by local NAT, home routers, and corporate firewalls.
+
+**Blender MCP Cloud Bridge** solves this permanently:
+* 🌐 **Public HTTPS Edge Gateway:** Automatically provisions a secure public tunnel via **Cloudflare Quick Tunnels** (zero configuration) or **ngrok** (bypasses datacenter IP restrictions).
+* 🤖 **Cloud Agent First:** Purpose-built for remote agents running in AWS, GCP, or Docker to send `bpy` commands, inspect active 3D scenes, and trigger renders.
+* ⚡ **Zero External Dependencies:** Built entirely with Python's standard library. Zero `pip install` required inside Blender.
+* 🔒 **Hardened Bearer Authentication:** Enforces secret API token validation on all inbound execution requests.
+* 🖥️ **Universal Client Support:** Connects cloud agents via REST (`POST /execute`) or MCP (`POST /mcp`), plus 1-click integration for desktop assistants like **Claude Desktop** and **Cursor** (`GET /sse`).
 
 ---
 
-## ⚡ Architecture
+## ⚡ Architecture Flow
 
 ```
-┌─────────────────────────────────┐
-│     Cloud AI Agent / Client     │  (Claude Desktop, Cursor, Muse AI,
-│   (MCP Client / OpenAPI / REST) │   Hermes, OpenClaw, Custom GPTs)
-└────────────────┬────────────────┘
-                 │  HTTPS + Bearer API Key
-                 ▼
-┌─────────────────────────────────┐
-│  Secure Tunnel Edge Gateway     │  (Cloudflare Quick Tunnel or ngrok)
-└────────────────┬────────────────┘
-                 │  Loopback HTTP (Port 8765)
-                 ▼
-┌─────────────────────────────────┐
-│    Blender MCP Cloud Bridge     │  (Zero-dependency Python runtime)
-│   • Auth & Rate Limiting        │  • MCP JSON-RPC 2.0 (SSE / Messages)
-│   • OpenAPI Spec Generator      │  • REST Endpoints (/execute, /health)
-└────────────────┬────────────────┘
-                 │  Null-byte JSON Socket (Port 9876)
-                 ▼
-┌─────────────────────────────────┐
-│       Local Blender 3D          │  (Executes Python code with `bpy`
-│       Active Workspace          │   context & sandboxed error guards)
-└─────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│             Cloud AI Assistants & Frameworks           │
+│   • Muse AI (New)        • OpenClaw Agent              │
+│   • Hermes Agent         • Cloud LLM Pipelines (AWS)   │
+│   • Claude Desktop       • Cursor IDE                  │
+└───────────────────────────┬────────────────────────────┘
+                            │ HTTPS + Bearer API Key
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│            Secure Tunnel Edge Gateway                  │
+│    (Cloudflare Quick Tunnels or ngrok Edge Node)       │
+└───────────────────────────┬────────────────────────────┘
+                            │ Loopback HTTP (:8765)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│            Blender MCP Cloud Bridge                    │
+│   • Token Auth & Rate Guards  • MCP Protocol Server    │
+│   • OpenAPI 3.0 Generator     • REST & SSE Handlers    │
+└───────────────────────────┬────────────────────────────┘
+                            │ Non-blocking JSON Socket (:9876)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│               Local Blender 3D Instance                │
+│   • Full `bpy` Access         • Weak Sandbox Guard     │
+│   • Scene Graph Inspector     • Real-time Output Sync  │
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start (60 Seconds)
+## 🤖 Connecting Cloud Assistants & Autonomous Agents
 
-### Option 1: In-Blender Extension (Recommended)
+### 1. Cloud Agents (Muse AI, OpenClaw, Hermes, Custom Python)
 
-1. Download **`mcp-cloud.zip`** from [Releases](https://github.com/FahimXits/blender-mcp-cloud-bridge/releases).
-2. In Blender, navigate to **Edit > Preferences > Get Extensions / Add-ons > Install from Disk...** and select `mcp-cloud.zip`.
-3. Open the **3D Viewport**, press `N` to open the sidebar, and select the **MCP** tab.
-4. Select your preferred tunnel (**Cloudflare** or **ngrok**), configure your API key, and click **Start Cloud Bridge**.
-5. Click **Copy Agent Config** and paste directly into your assistant!
-
----
-
-### Option 2: Standalone Bridge Script
-
-If your Blender MCP socket server is already listening on `localhost:9876`:
+Autonomous cloud agents can execute procedural 3D modeling scripts, create objects, and query geometry over standard authenticated REST:
 
 ```bash
-# Clone the repository
-git clone https://github.com/FahimXits/blender-mcp-cloud-bridge.git
-cd blender-mcp-cloud-bridge
+curl -X POST "https://YOUR-TUNNEL-URL.trycloudflare.com/execute" \
+  -H "Authorization: Bearer YOUR_AGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "import bpy\nbpy.ops.mesh.primitive_monkey_add(location=(0,0,1))\nresult = {\"status\": \"success\", \"object\": bpy.context.active_object.name}"
+  }'
+```
 
-# Run with Cloudflare Quick Tunnel (zero account needed)
-python bridge.py --tunnel cloudflare
+#### Python Example for Cloud Agent Frameworks:
+```python
+import requests
 
-# Or run with ngrok
-python bridge.py --tunnel ngrok
+BRIDGE_URL = "https://YOUR-TUNNEL-URL.trycloudflare.com/execute"
+API_KEY = "YOUR_AGENT_API_KEY"
+
+def instruct_blender(python_code: str) -> dict:
+    response = requests.post(
+        BRIDGE_URL,
+        headers={"Authorization": f"Bearer {API_KEY}"},
+        json={"code": python_code}
+    )
+    return response.json()
+
+# Example: Ask agent to inspect and build
+result = instruct_blender("""
+import bpy
+bpy.ops.mesh.primitive_cylinder_add(radius=1.5, depth=3.0)
+result = {"created": bpy.context.active_object.name, "total_objects": len(bpy.data.objects)}
+""")
+print(result)
 ```
 
 ---
 
-## 🔌 Connecting AI Assistants
+### 2. Streamable HTTP & SSE MCP (Model Context Protocol)
 
-### 1. Claude Desktop & Cursor (MCP SSE)
+For cloud agents and MCP clients using native JSON-RPC 2.0:
 
-Add the following to your `claude_desktop_config.json` or Cursor MCP settings:
+* **Streamable HTTP Endpoint:** `POST https://YOUR-TUNNEL-URL.trycloudflare.com/mcp`
+* **SSE Endpoint:** `GET https://YOUR-TUNNEL-URL.trycloudflare.com/sse`
+* **Messages Endpoint:** `POST https://YOUR-TUNNEL-URL.trycloudflare.com/messages?session_id=<ID>`
 
+#### Available MCP Tools:
+| Tool Name | Description |
+| :--- | :--- |
+| `execute_blender_code` | Executes arbitrary Python code with direct access to Blender's `bpy` context. |
+| `get_blender_scene_info` | Retrieves comprehensive scene metadata: objects, meshes, materials, collections, render engine, and timeline frame info. |
+
+---
+
+### 3. Desktop Assistants (Claude Desktop & Cursor)
+
+While built for cloud assistants, desktop tools connect in 1 step:
+
+Add to your `claude_desktop_config.json` or Cursor MCP configuration:
 ```json
 {
   "mcpServers": {
@@ -99,58 +135,51 @@ Add the following to your `claude_desktop_config.json` or Cursor MCP settings:
 }
 ```
 
-#### Available MCP Tools:
-* `execute_blender_code`: Executes arbitrary Python code with direct access to the `bpy` module.
-* `get_blender_scene_info`: Retrieves active scene metadata, object coordinates, materials, collections, and timeline states.
+---
+
+### 4. Custom GPTs & ChatGPT Actions
+* Paste your OpenAPI spec directly: `https://YOUR-TUNNEL-URL.trycloudflare.com/openapi.json`
+* Choose **Authentication: Bearer** and provide your Agent API Key.
 
 ---
 
-### 2. Custom GPTs & ChatGPT Actions
+## 🚀 Quick Setup (60 Seconds)
 
-1. In ChatGPT GPT Builder, navigate to **Actions > Create new action**.
-2. Set **Schema URL** to:
-   ```
-   https://YOUR-TUNNEL-URL.trycloudflare.com/openapi.json
-   ```
-3. Set **Authentication**:
-   * Type: `API Key`
-   * Auth Type: `Bearer`
-   * Key: `YOUR_AGENT_API_KEY`
+### Option A: Install Inside Blender (Recommended)
+
+1. Download **`mcp-cloud.zip`** from [Latest Releases](https://github.com/FahimXits/blender-mcp-cloud-bridge/releases).
+2. In Blender, go to **Edit > Preferences > Get Extensions / Add-ons > Install from Disk...** and select `mcp-cloud.zip`.
+3. Press `N` in the 3D Viewport to open the sidebar and click the **MCP** tab.
+4. Select your tunnel provider:
+   * **Cloudflare (Quick Tunnel):** No account or registration needed.
+   * **ngrok (Recommended for Datacenters):** Prevents cloud IP blocking when agents call from AWS/GCP.
+5. Click **Start Cloud Bridge** ➔ Click **Copy Agent Config** to pass directly to your AI agent!
 
 ---
 
-### 3. REST API (`POST /execute`)
+### Option B: Standalone Companion CLI
 
-Direct programmatic execution for autonomous cloud agents (Muse AI, Hermes, OpenClaw, LangChain):
+If your Blender socket is already running on `127.0.0.1:9876`:
 
 ```bash
-curl -X POST "https://YOUR-TUNNEL-URL.trycloudflare.com/execute" \
-  -H "Authorization: Bearer YOUR_AGENT_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "code": "import bpy\nbpy.ops.mesh.primitive_cube_add(location=(0,0,2))\nresult={\"name\": bpy.context.active_object.name}"
-  }'
-```
+# Clone the repository
+git clone https://github.com/FahimXits/blender-mcp-cloud-bridge.git
+cd blender-mcp-cloud-bridge
 
-**Response Format:**
-```json
-{
-  "status": "ok",
-  "result": {
-    "name": "Cube"
-  },
-  "stdout": "",
-  "stderr": ""
-}
+# Run with Cloudflare Quick Tunnel
+python bridge.py --tunnel cloudflare
+
+# Or run with ngrok
+python bridge.py --tunnel ngrok
 ```
 
 ---
 
-## 🔒 Security & Best Practices
+## 🔒 Security
 
-* **Bearer Token Authentication:** Every inbound request to `/execute`, `/sse`, `/messages`, and `/mcp` requires authentication matching `bridge_config.json`.
-* **Private Configuration:** Never commit `bridge_config.json` with active keys. Use `bridge_config.example.json` as a template.
-* **Code Sandboxing:** Code execution is governed by Blender's runtime sandbox, preventing fatal shell termination commands (`sys.exit`).
+* **Guarded Execution:** All inbound connections require a secret `Bearer <KEY>` token.
+* **Non-Blocking Architecture:** Never freezes Blender's viewport or UI thread while executing complex cloud requests.
+* **Safe Termination:** Restricts destructive terminal operations (`sys.exit`) within the calling context.
 
 ---
 
