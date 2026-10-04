@@ -1,0 +1,20 @@
+# Private configuration containing user API keys
+bridge_config.json
+
+# Binaries and executables
+*.exe
+cloudflared
+ngrok
+
+# Archives / builds
+*.zip
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+
+# Logs & temp files
+*.log

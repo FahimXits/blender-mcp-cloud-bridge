@@ -1,0 +1,9 @@
+{
+  "api_key": "YOUR_AGENT_API_KEY",
+  "ngrok_authtoken": "YOUR_NGROK_AUTHTOKEN_HERE",
+  "tunnel_provider": "ngrok",
+  "http_port": 8765,
+  "blender_host": "127.0.0.1",
+  "blender_port": 9876,
+  "request_timeout_seconds": 120
+}

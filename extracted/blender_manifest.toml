@@ -1,0 +1,19 @@
+schema_version = "1.0.0"
+
+id = "mcp"
+version = "1.0.4"
+name = "MCP with Cloud Bridge"
+tagline = "MCP server with ngrok & Cloudflare public tunnel bridge for cloud AI assistants"
+maintainer = "Blender Lab & Community"
+type = "add-on"
+website = "https://www.blender.org/lab/mcp-server/"
+blender_version_min = "5.1.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+tags = ["Development"]
+
+[permissions]
+network = "Runs local TCP socket server and optional public tunnel for MCP client communication"
